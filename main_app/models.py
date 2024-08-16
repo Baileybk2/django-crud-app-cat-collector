@@ -1,6 +1,12 @@
 from django.db import models
 from django.urls import reverse
 
+MEALS = (
+    ('B', 'Breakfast'),
+    ('L', 'Lunch'),
+    ('D', 'Dinner')
+)
+
 # Create your models here.
 class Cat(models.Model):
     name = models.CharField(max_length=100)
@@ -16,3 +22,17 @@ class Cat(models.Model):
         # Use the 'reverse' function to dynamically find the URL for viewing this cat's details
         return reverse('cat-detail', kwargs={'cat_id': self.id})
     
+class Feeding(models.Model):
+    date = models.DateField('Feeding date')
+    meal = models.CharField(
+        max_length=1,
+        choices=MEALS,
+        default=MEALS[0][0]
+        # first 0 references the first tuple in meals, and the second 0 references the first position in the first tuple
+        )
+    
+    cat = models.ForeignKey(Cat, on_delete=models.CASCADE)
+    # whenever associated or parent model is deleted(a cat) this line will automatically delete the feedings 
+    
+    def __str__(self):
+        return f'{self.get_meal_display()} on {self.date}'
